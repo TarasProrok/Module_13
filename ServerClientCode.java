@@ -1,80 +1,94 @@
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpClient;
+import java.util.List;
+import java.util.Scanner;
 
 public class ServerClientCode {
-    public static void main(String[] args) throws Exception {
+    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+    private static final Gson GSON = new Gson();
 
-        // Creating new user with params
-        Geo geo = new Geo();
-        Address address = new Address();
-        Company company = new Company();
-        User user = new User();
-
-        user.setName("Test");
-        user.setUsername("TEST");
-        user.setEmail("test@test.com");
-        user.setAddress(address);
-        address.setStreet("Kulas Light");
-        address.setSuite("Apt. 556");
-        address.setCity("Gwenborough");
-        address.setZipcode("92998-3874");
-        address.setGeo(geo);
-        geo.setLat(-37.3159);
-        geo.setLng(81.1496);
-        user.setPhone("1-770-736-8031 x56442");
-        user.setWebsite("hildegard.org");
-        user.setCompany(company);
-        company.setName("Romaguera-Crona");
-        company.setCatchPhrase("Multi-layered client-server neural-net");
-        company.setBs("harness real-time e-markets");
-
-        Gson gson = new Gson();
-        String jsonRequest = gson.toJson(user);
+    public static User postRequest (URI uri, User user) throws Exception {
+        final String jsonRequest = GSON.toJson(user);
         System.out.println(jsonRequest);
 
-
         HttpRequest postRequest = HttpRequest.newBuilder()
-                .uri(new URI("https://jsonplaceholder.typicode.com/users"))
+                .uri(uri)
                 .POST(HttpRequest.BodyPublishers.ofString(jsonRequest))
                 .build();
-        HttpClient httpClient = HttpClient.newHttpClient();
-        HttpResponse<String> postResponse = httpClient.send(postRequest, HttpResponse.BodyHandlers.ofString());
+
+        HttpResponse<String> postResponse = CLIENT.send(postRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println(postResponse.body());
-        user = gson.fromJson(postResponse.body(), User.class);
+        return GSON.fromJson(postResponse.body(), User.class);
+
+    }
+
+    public static User getRequest (URI uri) throws Exception {
 
         HttpRequest getRequest = HttpRequest.newBuilder()
-                .uri(new URI("https://jsonplaceholder.typicode.com/users/9"))
+                .uri(uri)
                 .build();
 
-        HttpResponse<String> getResponse = httpClient.send(getRequest, HttpResponse.BodyHandlers.ofString());
-        user = gson.fromJson(getResponse.body(), User.class);
+        HttpResponse<String> getResponse = CLIENT.send(getRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println(getResponse.body());
+        return GSON.fromJson(getResponse.body(), User.class);
+    }
+    public static User deleteRequest (URI uri) throws Exception {
 
-        System.out.println("Deleting");
         HttpRequest deleteRequest = HttpRequest.newBuilder()
-                .uri(new URI("https://jsonplaceholder.typicode.com/users/10"))
+                .uri(uri)
                 .DELETE()
                 .build();
 
-        HttpResponse<String> deleteResponse = httpClient.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println(deleteResponse.body());
+        HttpResponse<String> deleteResponse = CLIENT.send(deleteRequest, HttpResponse.BodyHandlers.ofString());
+        return GSON.fromJson(deleteResponse.body(), User.class);
+    }
 
-        System.out.println("All users info");
-        for (int i=1; i<=10; i++) {
+    public static List<User> showAllUsers (URI uri) throws Exception {
+
         HttpRequest getAllRequest = HttpRequest.newBuilder()
-                .uri(new URI("https://jsonplaceholder.typicode.com/users/"+i))
+                .uri(uri)
                 .build();
+        HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(getAllResponse.body());
+        return GSON.fromJson(getAllResponse.body(), new TypeToken<List<User>>() {}.getType());
+    }
 
-            HttpResponse<String> getAllResponse = httpClient.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
-            user = gson.fromJson(getAllResponse.body(), User.class);
-            System.out.println(getAllResponse.body());
+    public static User getUserById (String url, int id) throws Exception {
+        HttpRequest getAllRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url + id))
+                .build();
+        HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(getAllResponse.body());
+        return GSON.fromJson(getAllResponse.body(), User.class);
+    }
 
-            }
+    public static void getUserNames () throws Exception {
+        System.out.println("Usernames:");
+        for (int i = 1; i <= 10; i++) {
+            HttpRequest getAllRequest = HttpRequest.newBuilder()
+                    .uri(new URI("https://jsonplaceholder.typicode.com/users/" + i))
+                    .build();
 
+            HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+            final User user = GSON.fromJson(getAllResponse.body(), User.class);
+            System.out.println(user.getUsername());
+        }
+    }
+
+    public static List<User> getUserByUserName (String url, String username) throws Exception {
+
+        HttpRequest getAllRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url+username))
+                .build();
+        HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+        System.out.println(getAllResponse.body());
+        return GSON.fromJson(getAllResponse.body(), new TypeToken<List<User>>() {}.getType());
 
         }
+
     }
