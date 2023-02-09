@@ -31,26 +31,29 @@ public class ServerClientCodeApplication {
         company.setCatchPhrase("Multi-layered client-server neural-net");
         company.setBs("harness real-time e-markets");
 
+        // Task 1
+
         ServerClientCode.postRequest(URI.create("https://jsonplaceholder.typicode.com/users"), user);
 
-//        ServerClientCode.getRequest(URI.create("https://jsonplaceholder.typicode.com/users/11"));
-//
-//        ServerClientCode.deleteRequest(URI.create("https://jsonplaceholder.typicode.com/users/10"));
-//
-//        ServerClientCode.showAllUsers(URI.create("https://jsonplaceholder.typicode.com/users"));
-//
-//        ServerClientCode.getUserById("https://jsonplaceholder.typicode.com/users/", 8);
-//
-//        ServerClientCode.getUserNames();
-//
-//        ServerClientCode.getUserByUserName("https://jsonplaceholder.typicode.com/users?username=", "Bret");
-//
-          //Task 3
-//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        String toJson = gson.toJson(ServerClientCode.openUserTasks("https://jsonplaceholder.typicode.com/users/",1));
-//        System.out.println("To Json : "+toJson);
-//        System.out.println(ServerClientCode.lastPostId(URI.create("https://jsonplaceholder.typicode.com/users/1/posts")));
-          ServerClientCode.lastPostId(URI.create("https://jsonplaceholder.typicode.com/users/1/posts"));
-          ServerClientCode.userComments("https://jsonplaceholder.typicode.com/posts/");
+        ServerClientCode.getRequest(URI.create("https://jsonplaceholder.typicode.com/users/11"));
+
+        ServerClientCode.deleteRequest(URI.create("https://jsonplaceholder.typicode.com/users/10"));
+
+        ServerClientCode.showAllUsers(URI.create("https://jsonplaceholder.typicode.com/users"));
+
+        ServerClientCode.getUserById("https://jsonplaceholder.typicode.com/users/", 8);
+
+        ServerClientCode.getUserByUserName("https://jsonplaceholder.typicode.com/users?username=", "Bret");
+
+        //      Task 2
+
+        ServerClientCode.userComments("https://jsonplaceholder.typicode.com/posts/");
+
+        //      Task 3
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String toJson = gson.toJson(ServerClientCode.openUserTasks("https://jsonplaceholder.typicode.com/users/",1));
+        System.out.println("To Json : "+toJson);
+
     }
 }

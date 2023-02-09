@@ -1,19 +1,15 @@
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpClient;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class ServerClientCode {
@@ -117,7 +113,7 @@ public class ServerClientCode {
                 .collect(Collectors.toList());
     }
 
-    //Getting last post ID
+    //method getting last post ID for next method (userComments)
     public static void lastPostId(URI uri) throws Exception {
         HttpRequest getAllRequest = HttpRequest.newBuilder()
                 .uri(uri)
@@ -135,24 +131,15 @@ public class ServerClientCode {
 
     public static void userComments(String url) throws Exception {
 
+        ServerClientCode.lastPostId(URI.create("https://jsonplaceholder.typicode.com/users/1/posts"));
         int id = howmanyidies.get(0);
-        String filename = "test.json";
+        int userId = 1;
         HttpRequest getAllRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url + id + "/comments"))
                 .build();
-        HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
-        List<Comments> commentsList = GSON.fromJson(getAllResponse.body(), new TypeToken<List<Task>>() {}.getType());
+        String filename = "user-"+userId+"-post-"+id+"-comments.json";
+        HttpResponse<Path> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofFile(Paths.get(filename)));
         System.out.println(getAllResponse.body());
-
-
-
-        File file = new File("test.json");
-        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
-            oos.writeObject(commentsList);
-            System.out.println("File has been written");
-        } catch(Exception ex) {
-            System.out.println(ex.getMessage());
-        }
     }
 }
 
