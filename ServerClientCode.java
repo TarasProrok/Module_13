@@ -1,19 +1,26 @@
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpClient;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ServerClientCode {
     private static final HttpClient CLIENT = HttpClient.newHttpClient();
     private static final Gson GSON = new Gson();
+    static List<Integer> howmanyidies = new ArrayList<>();
+
 
     public static User postRequest(URI uri, User user) throws Exception {
         final String jsonRequest = GSON.toJson(user);
@@ -71,19 +78,19 @@ public class ServerClientCode {
         System.out.println(getAllResponse.body());
         return GSON.fromJson(getAllResponse.body(), User.class);
     }
-
-    public static void getUserNames() throws Exception {
-        System.out.println("Usernames:");
-        for (int i = 1; i <= 10; i++) {
-            HttpRequest getAllRequest = HttpRequest.newBuilder()
-                    .uri(new URI("https://jsonplaceholder.typicode.com/users/" + i))
-                    .build();
-
-            HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
-            final User user = GSON.fromJson(getAllResponse.body(), User.class);
-            System.out.println(user.getUsername());
-        }
-    }
+//     to get list of usernames
+//    public static void getUserNames() throws Exception {
+//        System.out.println("Usernames:");
+//        for (int i = 1; i <= 10; i++) {
+//            HttpRequest getAllRequest = HttpRequest.newBuilder()
+//                    .uri(new URI("https://jsonplaceholder.typicode.com/users/" + i))
+//                    .build();
+//
+//            HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+//            final User user = GSON.fromJson(getAllResponse.body(), User.class);
+//            System.out.println(user.getUsername());
+//        }
+//  }
 
     public static List<User> getUserByUserName(String url, String username) throws Exception {
 
@@ -102,16 +109,50 @@ public class ServerClientCode {
                 .uri(URI.create(url + userId + "/todos"))
                 .build();
         HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
-        List<Task> tasks = GSON.fromJson(getAllResponse.body(), new TypeToken<List<Task>>() {}.getType());
+        List<Task> tasks = GSON.fromJson(getAllResponse.body(), new TypeToken<List<Task>>() {
+        }.getType());
 
-            return tasks.stream()
+        return tasks.stream()
                 .filter(task -> !task.isCompleted())
                 .collect(Collectors.toList());
     }
 
-    public static void userComments (String url, int userId) {
+    //Getting last post ID
+    public static void lastPostId(URI uri) throws Exception {
+        HttpRequest getAllRequest = HttpRequest.newBuilder()
+                .uri(uri)
+                .build();
+        HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+        List<Posts> posts = GSON.fromJson(getAllResponse.body(), new TypeToken<List<Posts>>() {
+        }.getType());
 
+        howmanyidies = posts.stream()
+                .sorted(Comparator.comparing(Posts::getId).reversed())
+                .map(Posts::getId)
+                .limit(1)
+                .collect(Collectors.toList());
     }
 
+    public static void userComments(String url) throws Exception {
+
+        int id = howmanyidies.get(0);
+        String filename = "test.json";
+        HttpRequest getAllRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url + id + "/comments"))
+                .build();
+        HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+        List<Comments> commentsList = GSON.fromJson(getAllResponse.body(), new TypeToken<List<Task>>() {}.getType());
+        System.out.println(getAllResponse.body());
+
+
+
+        File file = new File("test.json");
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(commentsList);
+            System.out.println("File has been written");
+        } catch(Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }
 

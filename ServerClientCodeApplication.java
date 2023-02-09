@@ -10,6 +10,7 @@ public class ServerClientCodeApplication {
         Company company = new Company();
         User user = new User();
         Task task = new Task();
+        Posts posts = new Posts();
 
 
         user.setName("Test");
@@ -44,12 +45,12 @@ public class ServerClientCodeApplication {
 //
 //        ServerClientCode.getUserByUserName("https://jsonplaceholder.typicode.com/users?username=", "Bret");
 //
-        //Task 3
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String toJson = gson.toJson(ServerClientCode.openUserTasks("https://jsonplaceholder.typicode.com/users/",1));
-        System.out.println("To Json : "+toJson);
-
-
-
+          //Task 3
+//        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+//        String toJson = gson.toJson(ServerClientCode.openUserTasks("https://jsonplaceholder.typicode.com/users/",1));
+//        System.out.println("To Json : "+toJson);
+//        System.out.println(ServerClientCode.lastPostId(URI.create("https://jsonplaceholder.typicode.com/users/1/posts")));
+          ServerClientCode.lastPostId(URI.create("https://jsonplaceholder.typicode.com/users/1/posts"));
+          ServerClientCode.userComments("https://jsonplaceholder.typicode.com/posts/");
     }
 }
