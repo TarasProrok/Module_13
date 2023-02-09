@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.net.URI;
 
 public class ServerClientCodeApplication {
@@ -6,6 +9,8 @@ public class ServerClientCodeApplication {
         Address address = new Address();
         Company company = new Company();
         User user = new User();
+        Task task = new Task();
+
 
         user.setName("Test");
         user.setUsername("TEST");
@@ -27,17 +32,24 @@ public class ServerClientCodeApplication {
 
         ServerClientCode.postRequest(URI.create("https://jsonplaceholder.typicode.com/users"), user);
 
-        ServerClientCode.getRequest(URI.create("https://jsonplaceholder.typicode.com/users/11"));
+//        ServerClientCode.getRequest(URI.create("https://jsonplaceholder.typicode.com/users/11"));
+//
+//        ServerClientCode.deleteRequest(URI.create("https://jsonplaceholder.typicode.com/users/10"));
+//
+//        ServerClientCode.showAllUsers(URI.create("https://jsonplaceholder.typicode.com/users"));
+//
+//        ServerClientCode.getUserById("https://jsonplaceholder.typicode.com/users/", 8);
+//
+//        ServerClientCode.getUserNames();
+//
+//        ServerClientCode.getUserByUserName("https://jsonplaceholder.typicode.com/users?username=", "Bret");
+//
+        //Task 3
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String toJson = gson.toJson(ServerClientCode.openUserTasks("https://jsonplaceholder.typicode.com/users/",1));
+        System.out.println("To Json : "+toJson);
 
-        ServerClientCode.deleteRequest(URI.create("https://jsonplaceholder.typicode.com/users/10"));
 
-        ServerClientCode.showAllUsers(URI.create("https://jsonplaceholder.typicode.com/users"));
-
-        ServerClientCode.getUserById("https://jsonplaceholder.typicode.com/users/", 8);
-
-        ServerClientCode.getUserNames();
-
-        ServerClientCode.getUserByUserName("https://jsonplaceholder.typicode.com/users?username=", "Bret");
 
     }
 }

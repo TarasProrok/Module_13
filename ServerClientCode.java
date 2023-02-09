@@ -1,18 +1,21 @@
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpClient;
 import java.util.List;
-import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ServerClientCode {
     private static final HttpClient CLIENT = HttpClient.newHttpClient();
     private static final Gson GSON = new Gson();
 
-    public static User postRequest (URI uri, User user) throws Exception {
+    public static User postRequest(URI uri, User user) throws Exception {
         final String jsonRequest = GSON.toJson(user);
         System.out.println(jsonRequest);
 
@@ -27,7 +30,7 @@ public class ServerClientCode {
 
     }
 
-    public static User getRequest (URI uri) throws Exception {
+    public static User getRequest(URI uri) throws Exception {
 
         HttpRequest getRequest = HttpRequest.newBuilder()
                 .uri(uri)
@@ -37,7 +40,8 @@ public class ServerClientCode {
         System.out.println(getResponse.body());
         return GSON.fromJson(getResponse.body(), User.class);
     }
-    public static User deleteRequest (URI uri) throws Exception {
+
+    public static User deleteRequest(URI uri) throws Exception {
 
         HttpRequest deleteRequest = HttpRequest.newBuilder()
                 .uri(uri)
@@ -48,17 +52,18 @@ public class ServerClientCode {
         return GSON.fromJson(deleteResponse.body(), User.class);
     }
 
-    public static List<User> showAllUsers (URI uri) throws Exception {
+    public static List<User> showAllUsers(URI uri) throws Exception {
 
         HttpRequest getAllRequest = HttpRequest.newBuilder()
                 .uri(uri)
                 .build();
         HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println(getAllResponse.body());
-        return GSON.fromJson(getAllResponse.body(), new TypeToken<List<User>>() {}.getType());
+        return GSON.fromJson(getAllResponse.body(), new TypeToken<List<User>>() {
+        }.getType());
     }
 
-    public static User getUserById (String url, int id) throws Exception {
+    public static User getUserById(String url, int id) throws Exception {
         HttpRequest getAllRequest = HttpRequest.newBuilder()
                 .uri(URI.create(url + id))
                 .build();
@@ -67,7 +72,7 @@ public class ServerClientCode {
         return GSON.fromJson(getAllResponse.body(), User.class);
     }
 
-    public static void getUserNames () throws Exception {
+    public static void getUserNames() throws Exception {
         System.out.println("Usernames:");
         for (int i = 1; i <= 10; i++) {
             HttpRequest getAllRequest = HttpRequest.newBuilder()
@@ -80,15 +85,33 @@ public class ServerClientCode {
         }
     }
 
-    public static List<User> getUserByUserName (String url, String username) throws Exception {
+    public static List<User> getUserByUserName(String url, String username) throws Exception {
 
         HttpRequest getAllRequest = HttpRequest.newBuilder()
-                .uri(URI.create(url+username))
+                .uri(URI.create(url + username))
                 .build();
         HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
         System.out.println(getAllResponse.body());
-        return GSON.fromJson(getAllResponse.body(), new TypeToken<List<User>>() {}.getType());
+        return GSON.fromJson(getAllResponse.body(), new TypeToken<List<User>>() {
+        }.getType());
+    }
 
-        }
+    public static List<Task> openUserTasks(String url, int userId) throws Exception {
+
+        HttpRequest getAllRequest = HttpRequest.newBuilder()
+                .uri(URI.create(url + userId + "/todos"))
+                .build();
+        HttpResponse<String> getAllResponse = CLIENT.send(getAllRequest, HttpResponse.BodyHandlers.ofString());
+        List<Task> tasks = GSON.fromJson(getAllResponse.body(), new TypeToken<List<Task>>() {}.getType());
+
+            return tasks.stream()
+                .filter(task -> !task.isCompleted())
+                .collect(Collectors.toList());
+    }
+
+    public static void userComments (String url, int userId) {
 
     }
+
+}
+
